@@ -4,8 +4,9 @@
 
 <head>
     <meta charset="utf-8">
-    <meta name="keywords" content="友情链接, Mapuboy小抄">
-    <meta name="description" content="无关乎爱">
+    <meta name="keywords" content="Jenkins 判断是否超时, Mapuboy小抄">
+    <meta name="description" content="需求有些脚本是在for loop里的, 可能会超时, 但是又不想直接退出job, 所以需要判断是不是超时并continue
+要求这里面需要给拿操作用户的cause.getUser(), approve一下script权限, 如果还没有找je">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta name="renderer" content="webkit|ie-stand|ie-comp">
@@ -17,7 +18,7 @@
     <!-- Global site tag (gtag.js) - Google Analytics -->
 
 
-    <title>友情链接 | Mapuboy小抄</title>
+    <title>Jenkins 判断是否超时 | Mapuboy小抄</title>
     <link rel="icon" type="image/png" href="/favicon.png">
     
 
@@ -334,12 +335,12 @@
 
 
 
-<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/9.jpg')">
+<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/3.jpg')">
     <div class="container" style="right: 0px;left: 0px;">
         <div class="row">
             <div class="col s12 m12 l12">
                 <div class="brand">
-                    <h1 class="description center-align post-title">友情链接</h1>
+                    <h1 class="description center-align post-title">Jenkins 判断是否超时</h1>
                 </div>
             </div>
         </div>
@@ -368,6 +369,15 @@
                 </div>
                 <div class="col s5 right-align">
                     
+                    <div class="post-cate">
+                        <i class="fas fa-bookmark fa-fw icon-category"></i>
+                        
+                            <a href="/categories/jenkins/" class="post-category">
+                                jenkins
+                            </a>
+                        
+                    </div>
+                    
                 </div>
             </div>
 
@@ -375,7 +385,7 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
-                    2022-08-22
+                    2023-09-19
                 </div>
                 
 
@@ -399,7 +409,51 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                
+                <h3 id="需求"><a href="#需求" class="headerlink" title="需求"></a>需求</h3><p>有些脚本是在for loop里的, 可能会超时, 但是又不想直接退出job, 所以需要判断是不是超时并continue</p>
+<h4 id="要求"><a href="#要求" class="headerlink" title="要求"></a>要求</h4><p>这里面需要给拿操作用户的cause.getUser(), approve一下script权限, 如果还没有找jenkins add开.</p>
+<pre class="line-numbers language-Groovy" data-language="Groovy"><code class="language-Groovy">boolean isTimeout(err) &#123;
+    if (err instanceof org.jenkinsci.plugins.workflow.steps.FlowInterruptedException) &#123;
+        try &#123;
+            CauseOfInterruption cause &#x3D; err.getCauses().get(0);
+            if (cause instanceof CauseOfInterruption.UserInterruption) &#123;
+                def user &#x3D; cause.getUser()
+                if (&#39;SYSTEM&#39; &#x3D;&#x3D; user.toString()) &#123; &#x2F;&#x2F; SYSTEM means timeout
+                    echo(&#39;Timeout!!!&#39;)
+                    return true
+                &#125; else &#123;
+                    echo(&quot;Pipeline aborted by: [$&#123;user&#125;]&quot;)
+                    return false
+                &#125;
+            &#125; else &#123;
+                echo(&#39;Maybe Timeout!!!&#39;)
+                return true
+            &#125;
+        &#125; catch (e) &#123;
+            echo &quot;debug: isTimeout? : $&#123;e.dump()&#125;&quot;
+            echo(&#39;Maybe Timeout!&#39;)
+            return true
+        &#125;
+    &#125;
+    return false
+&#125;
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h3 id="应用"><a href="#应用" class="headerlink" title="应用"></a>应用</h3><pre class="line-numbers language-Groovy" data-language="Groovy"><code class="language-Groovy">stage(&quot;e2e&quot;) &#123;
+    for(int i&#x3D;0; i&lt;10; i++) &#123;
+        try &#123;
+            echo(&quot;selenium start&quot;)
+            sleep(120)
+            echo(&quot;selenium done&quot;)
+        &#125; catch (err) &#123;
+            echo(&quot;error::: $&#123;isTimeout(err)&#125;&quot; )
+            if(!isTimeout(err)) &#123;
+                echo(&quot;should abort!!!&quot;)
+                throw(err)
+            &#125;
+        &#125;
+    &#125; 
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
                 
             </div>
             <hr/>
@@ -425,7 +479,7 @@
                     </i>
                 </span>
                 <span class="reprint-info">
-                    <a href="https://mapuboy.github.io/links/index.html">https://mapuboy.github.io/links/index.html</a>
+                    <a href="https://mapuboy.github.io/2023/09/19/jenkins/is-timeout/">https://mapuboy.github.io/2023/09/19/jenkins/is-timeout/</a>
                 </span>
             </div>
             <div class="reprint__notice">
@@ -546,13 +600,13 @@
                 <i class="far fa-dot-circle"></i>&nbsp;本篇
             </div>
             <div class="card">
-                <a href="/links/index.html">
+                <a href="/2023/09/19/jenkins/is-timeout/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/9.jpg" class="responsive-img" alt="友情链接">
+                        <img src="/medias/featureimages/3.jpg" class="responsive-img" alt="Jenkins 判断是否超时">
                         
-                        <span class="card-title">友情链接</span>
+                        <span class="card-title">Jenkins 判断是否超时</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
@@ -563,12 +617,16 @@
                     </div>
                     <div class="publish-info">
                             <span class="publish-date">
-                                <i class="far fa-clock fa-fw icon-date"></i>2022-08-22
+                                <i class="far fa-clock fa-fw icon-date"></i>2023-09-19
                             </span>
                         <span class="publish-author">
                             
-                            <i class="fas fa-user fa-fw"></i>
-                            Potar
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/jenkins/" class="post-category">
+                                    jenkins
+                                </a>
+                            
                             
                         </span>
                     </div>
@@ -581,16 +639,16 @@
         
         <div class="article col s12 m6" data-aos="fade-up">
             <div class="article-badge right-badge text-color">
-                本篇&nbsp;<i class="far fa-dot-circle"></i>
+                下一篇&nbsp;<i class="fas fa-chevron-right"></i>
             </div>
             <div class="card">
-                <a href="/links/index.html">
+                <a href="/2022/08/22/jenkins-rsync/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/9.jpg" class="responsive-img" alt="友情链接">
+                        <img src="/medias/featureimages/4.jpg" class="responsive-img" alt="Jenkins Rsync使用">
                         
-                        <span class="card-title">友情链接</span>
+                        <span class="card-title">Jenkins Rsync使用</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
@@ -605,13 +663,16 @@
                             </span>
                         <span class="publish-author">
                             
-                            <i class="fas fa-user fa-fw"></i>
-                            Potar
+                            <i class="fas fa-bookmark fa-fw icon-category"></i>
+                            
+                            <a href="/categories/%E5%A4%A7%E5%89%8D%E7%AB%AF/" class="post-category">
+                                    大前端
+                                </a>
+                            
                             
                         </span>
                     </div>
                 </div>
-
                 
             </div>
         </div>
